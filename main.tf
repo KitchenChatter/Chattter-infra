@@ -9,7 +9,7 @@ terraform {
 }
 
 provider "docker" {
-	host = "unix:///Users/mrOwens/.docker/run/docker.sock"
+	host = var.docker_socket_path
 }
 
 
@@ -26,6 +26,6 @@ resource "docker_container" "web_server" {
 
   ports {
     internal = 80
-    external = 8080
+    external = var.web_server_external_port
   }
 }

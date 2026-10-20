@@ -1,31 +1,52 @@
-# 1. The Provider Block: Tells Terraform to use Docker
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 1. Cloud Provider Block: Tell Terraform to look at AWS
 terraform {
   required_providers {
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "~> 3.0.1"
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
     }
   }
 }
 
-provider "docker" {
-	host = var.docker_socket_path
+# The AWS region is inherited from your "aws configure" terminal settings
+provider "aws" {
+  region = "us-west-1"
 }
 
+# 2. Virtual Server Block: Provision a free-tier virtual machine (EC2)
+resource "aws_instance" "chattter_cloud_server" {
+  # The Amazon Machine Image ID for a basic Ubuntu 22.04 server in us-west-1
+  ami           = "ami-0cbd40f694b804622" 
+  
+  # t2.micro is the golden standard size for the 100% Free Tier allotment
+  instance_type = "t2.micro"
 
-# 2. The Resource Block: Download the official Nginx web server image
-resource "docker_image" "nginx" {
-  name         = "nginx:latest"
-  keep_locally = false
-}
-
-# 3. The Resource Block: Spin up a container and map it to your Mac's ports
-resource "docker_container" "web_server" {
-  image = docker_image.nginx.image_id
-  name  = "chattter_local_webserver"
-
-  ports {
-    internal = 80
-    external = var.web_server_external_port
+  tags = {
+    Name = "Chattter-Cloud-Prod-Server"
   }
 }
